@@ -14,7 +14,7 @@ resource "heroku_build" "holdermind-frontend" {
 
   source = {
     url = "https://github.com/mombachm/holdermind-frontend/archive/master.tar.gz"
-    version = "1.0"
+    # version = "1.0"
   }
 }
 
