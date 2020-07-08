@@ -2,6 +2,17 @@ provider "heroku" {
   version = "~> 2.0"
 }
 
+provider "github" {
+  individual = "true"
+  anonymous = "true"
+}
+
+data "github_release" "release" {
+    repository  = "holdermind-frontend"
+    owner       = "mombachm"
+    retrieve_by = "latest"
+}
+
 resource "heroku_app" "holdermind-frontend" {
   name   = "holdermind-frontend"
   region = "us"
@@ -13,8 +24,8 @@ resource "heroku_build" "holdermind-frontend" {
   buildpacks = ["https://github.com/mars/create-react-app-buildpack.git"]
 
   source = {
-    url = "https://github.com/mombachm/holdermind-frontend/archive/master.tar.gz"
-    version = "0.1"
+    url = data.github_release.release.tarball_url
+    version = data.github_release.release.name
   }
 }
 
