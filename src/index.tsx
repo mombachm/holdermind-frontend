@@ -3,6 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { StockService } from './services/StockService';
+
+StockService.getStockinfo().then((result) => {
+  console.log("---------- TEST SERVICE CALL ---------");
+  console.log(result);
+});
 
 ReactDOM.render(
   <React.StrictMode>

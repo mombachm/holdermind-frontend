@@ -1,0 +1,1 @@
+export const StockServiceURI = "https://holdermind-stock-service.herokuapp.com";
