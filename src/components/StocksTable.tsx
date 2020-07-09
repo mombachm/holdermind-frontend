@@ -27,6 +27,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
+import { MainFormatter } from "../formatters/MainFormatter";
 
 const tableIcons: Icons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -53,28 +54,8 @@ const tableIcons: Icons = {
 };
 
 interface TableState {
-  columns: Array<Column<StockInfo>>;
+  columns: Array<Column<any>>;
   data: Array<any>;
-}
-
-interface StockInfo {
-  symbol: string;
-  regularMarketPrice: {
-    raw: number;
-    fmt: string;
-  };
-  trailingAnnualDividendYield: {
-    raw: number;
-    fmt: string;
-  };
-  trailingPE: {
-    raw: number;
-    fmt: string;
-  };
-  forwardPE: {
-    raw: number;
-    fmt: string;
-  };
 }
 
 const StocksTable: React.FC = () => {
@@ -91,12 +72,26 @@ const StocksTable: React.FC = () => {
         title: "Valor de Mercado (R$)",
         field: "regularMarketPrice",
         type: "numeric",
+        render: rowData => MainFormatter.formatDecimalValue(rowData.regularMarketPrice)
       },
       {
-        title: "Dividend Yield Passado Anual",
+        title: "Dividend Yield Passado Anual (%)",
         field: "trailingAnnualDividendYield",
         type: "numeric",
+        render: rowData => MainFormatter.formatPercentValue(rowData.trailingAnnualDividendYield)
       },
+      {
+        title: "P/L Passado",
+        field: "trailingPE",
+        type: "numeric",
+        render: rowData => MainFormatter.formatDecimalValue(rowData.trailingPE)
+      },
+      {
+        title: "P/L Futuro",
+        field: "forwardPE",
+        type: "numeric",
+        render: rowData => MainFormatter.formatDecimalValue(rowData.forwardPE)
+      }
     ],
     data: [],
   });
@@ -104,17 +99,7 @@ const StocksTable: React.FC = () => {
   async function fetchStocks(): Promise<void> {
     const stocks = await StockService.getStocksInfo(stocksCode);
     setTableState((prevState) => {
-      const tableData = stocks.map((stock) => {
-        return {
-          symbol: stock.symbol,
-          regularMarketPrice: stock.regularMarketPrice.raw,
-          trailingAnnualDividendYield: stock.trailingAnnualDividendYield
-            ? stock.trailingAnnualDividendYield.raw
-            : "",
-        };
-      });
-      debugger;
-      return { ...prevState, data: tableData };
+      return { ...prevState, data: stocks };
     });
   }
 
