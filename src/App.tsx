@@ -5,12 +5,12 @@ import StocksTable from './components/StocksTable';
 function App() {
   return (
     <div>
-      <header className="App-header">
+      <header>
         <p>
           Holdermind
         </p>
-        <StocksTable/>
       </header>
+      <StocksTable/>
     </div>
   );
 }
