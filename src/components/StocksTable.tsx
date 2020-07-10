@@ -69,10 +69,22 @@ const StocksTable: React.FC = () => {
     columns: [
       { title: "Código", field: "symbol", type: "string" },
       {
+        title: "Variação (%)",
+        field: "regularMarketChangePercent",
+        type: "numeric",
+        render: rowData => MainFormatter.formatDecimalValue(rowData.regularMarketChangePercent)
+      },
+      {
         title: "Valor de Mercado (R$)",
         field: "regularMarketPrice",
         type: "numeric",
         render: rowData => MainFormatter.formatDecimalValue(rowData.regularMarketPrice)
+      },
+      {
+        title: "Dividend Yield (%)",
+        field: "dividendYield",
+        type: "numeric",
+        render: rowData => MainFormatter.formatDecimalValue(rowData.dividendYield)
       },
       {
         title: "Dividend Yield Passado Anual (%)",
@@ -91,15 +103,31 @@ const StocksTable: React.FC = () => {
         field: "forwardPE",
         type: "numeric",
         render: rowData => MainFormatter.formatDecimalValue(rowData.forwardPE)
+      },
+      {
+        title: "ROA (%)",
+        field: "returnOnAssets",
+        type: "numeric",
+        render: rowData => MainFormatter.formatPercentValue(rowData.returnOnAssets)
+      },
+      {
+        title: "ROE (%)",
+        field: "returnOnEquity",
+        type: "numeric",
+        render: rowData => MainFormatter.formatPercentValue(rowData.returnOnEquity)
       }
     ],
     data: [],
   });
 
   async function fetchStocks(): Promise<void> {
-    const stocks = await StockService.getStocksInfo(stocksCode);
-    setTableState((prevState) => {
-      return { ...prevState, data: stocks };
+    const stocksDataPromises: any[] = stocksCode.map(async stockCode => {
+      return await StockService.getStockMainInfo(stockCode);
+    });
+    Promise.all(stocksDataPromises).then((stocksData) => {
+      setTableState((prevState) => {
+        return { ...prevState, data: stocksData };
+      });
     });
   }
 
