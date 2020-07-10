@@ -140,7 +140,6 @@ const StocksTable: React.FC = () => {
   };
 
   const deleteStockInfoItem = async (oldStockInfoItem: any): Promise<void> => {
-    debugger;
     if (oldStockInfoItem.symbol) {
       removeStockCodeFromStocksCodeState(oldStockInfoItem.symbol);
     }

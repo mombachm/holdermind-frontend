@@ -7,10 +7,10 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey';
 const customTheme = createMuiTheme({
   palette: {
     primary: {
-      main: '#b72f4d'
+      main: '#01A0DB'
     },
     secondary: {
-      main: '#fff'
+      main: '#eee'
     },
     text:{
       primary: '#333',
