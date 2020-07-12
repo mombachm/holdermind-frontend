@@ -33,12 +33,10 @@ export default function SearchAutocomplete(props: any, context: any) {
   }, [textFieldValue]);
 
   const handleInputChange = (event: ChangeEvent<{}>, value: string, reason: AutocompleteInputChangeReason) => {
-    console.log("INPUT CHANGE: ", value);
     setTextFieldValue(value);
   };
 
   const handleSelectedOptionChange = (event: ChangeEvent<{}>, value: StockOption | null) => {
-    console.log("HANDLE CHANGE: ", value);
     setSelectedValue(value);
     props.onSelectedOptionChange(event, value);
   };
