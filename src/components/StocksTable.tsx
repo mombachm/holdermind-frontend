@@ -28,6 +28,7 @@ import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import { MainFormatter } from "../formatters/MainFormatter";
+import { UserStockDataService } from "../services/UserStockDataService";
 
 const tableIcons: Icons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -58,13 +59,12 @@ interface TableState {
   data: Array<any>;
 }
 
+interface StockCode {
+  code: string
+}
+
 const StocksTable: React.FC = () => {
-  const [stocksCode, setStocksCode] = useState<string[]>([
-    "FLRY3",
-    "EGIE3",
-    "ITSA4",
-    "CNTO3",
-  ]);
+  const [stocksCode, setStocksCode] = useState<StockCode[]>([]);
   const [tableState, setTableState] = useState<TableState>({
     columns: [
       { title: "Código", field: "symbol", type: "string" },
@@ -120,28 +120,43 @@ const StocksTable: React.FC = () => {
     data: [],
   });
 
-  async function fetchStocks(): Promise<void> {
-    const stocksDataPromises: any[] = stocksCode.map(async stockCode => {
-      return await StockService.getStockMainInfo(stockCode);
+  async function fetchUserStocksCode(): Promise<StockCode[]> {
+    const stocksCode = await UserStockDataService.GetUserStockCodes() as StockCode[];
+    setStocksCode(stocksCode);
+    return stocksCode;
+  }
+
+  async function fetchStocks(): Promise<any> {
+    debugger;
+    const stocksCode = await fetchUserStocksCode();
+    const stocksDataPromises: Promise<StockCode>[] = stocksCode.map(async stockCode => {
+      return await StockService.getStockMainInfo(stockCode.code);
     });
-    Promise.all(stocksDataPromises).then((stocksData) => {
-      setTableState((prevState) => {
-        return { ...prevState, data: stocksData };
-      });
+    return Promise.all(stocksDataPromises).then((stocksData) => {
+      return stocksData;
     });
+  }
+
+  async function fetchStockInfo(stockCode: string): Promise<any> {
+    const stockInfo = await StockService.getStockMainInfo(stockCode);
+    setTableState((prevState) => {
+      return { ...prevState, data: stockInfo };
+    });
+    return stockInfo;
   }
 
   const saveStockInfoItem = async (stockInfoItem: any): Promise<void> => {
     if (stockInfoItem.symbol && !isStockCodeAlreadyInTable(stockInfoItem.symbol)) {
-      setStocksCode((prevState) => {
-        return [...prevState, stockInfoItem.symbol];
-      })
+      const stockInfo = await fetchStockInfo(stockInfoItem.symbol);
+      if (stockInfo) {
+        await UserStockDataService.addUserStockCode(stockInfoItem.symbol);
+      }
     }
   };
 
   const deleteStockInfoItem = async (oldStockInfoItem: any): Promise<void> => {
     if (oldStockInfoItem.symbol) {
-      removeStockCodeFromStocksCodeState(oldStockInfoItem.symbol);
+      await UserStockDataService.removeStockCodeFromUser(oldStockInfoItem.symbol);
     }
   };
 
@@ -153,20 +168,9 @@ const StocksTable: React.FC = () => {
 
   const getStockInfoInTable = (stockCode: string): any => {
     return stocksCode.find((code) => {
-      return stockCode.includes(code);
+      return stockCode.includes(code.code);
     })
   };
-
-  const removeStockCodeFromStocksCodeState = (stockCode: string): void  => {
-    const newStocksCode = stocksCode.filter((code) => {
-      return !stockCode.includes(code);
-    })
-    setStocksCode(newStocksCode);
-  };
-
-  useEffect(() => {
-    fetchStocks();
-  }, [stocksCode]);
 
   return (
     <div className="MaterialTable-div">
@@ -177,7 +181,17 @@ const StocksTable: React.FC = () => {
         icons={tableIcons}
         title="Ações"
         columns={tableState.columns}
-        data={tableState.data}
+        data={() =>
+          new Promise(async (resolve, reject) => {
+              const data = await fetchStocks();
+              debugger;
+              resolve({
+                  data,
+                  page: 0,
+                  totalCount: data.length
+              });
+          })
+        }
         editable={{
           onRowAdd: (newData) => {
             return saveStockInfoItem(newData);

@@ -1,5 +1,4 @@
 import Axios from "axios";
-import { StockServiceURI } from "./settings/Settings";
 
 export enum StockControllerRoute {
   GetStocksInfo = "/getStocksInfo",
@@ -11,7 +10,7 @@ export class StockService {
     stocksCode: string | string[]
   ): Promise<any[]> {
     const response = await Axios.get(
-      StockServiceURI + StockControllerRoute.GetStocksInfo,
+      process.env.REACT_APP_STOCK_SERVICE_URI + StockControllerRoute.GetStocksInfo,
       this.buildGetStocksInfoParameters(stocksCode)
     );
     return response.data;
@@ -21,7 +20,7 @@ export class StockService {
     stockCode: string
   ): Promise<any | null> {
     const response = await Axios.get(
-      StockServiceURI + StockControllerRoute.GetStockMainInfo,
+      process.env.REACT_APP_STOCK_SERVICE_URI + StockControllerRoute.GetStockMainInfo,
       {
         params: {
           stockCode: stockCode,
