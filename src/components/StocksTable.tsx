@@ -176,12 +176,7 @@ const StocksTable: React.FC = () => {
 
   const saveStockInfoItem = async (stockInfoItem: any): Promise<void> => {
     if (selectedValue && !isStockCodeAlreadyInTable(selectedValue.symbol)) {
-      const stockInfo = await fetchStockInfo(selectedValue.symbol);
-      if (stockInfo) {
-        await UserStockDataService.addUserStockCode(selectedValue.symbol);
-      } else {
-        MessageAlert.showInfoMessage(Message.invalidStock);
-      }
+      await UserStockDataService.addUserStockCode(selectedValue.symbol);
     }
   };
 
@@ -208,6 +203,7 @@ const StocksTable: React.FC = () => {
       <MaterialTable
         options={{
           paging: false,
+          actionsColumnIndex: -1
         }}
         icons={tableIcons}
         title="Ações"

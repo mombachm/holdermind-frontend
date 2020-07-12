@@ -41,6 +41,13 @@ export default function SearchAutocomplete(props: any, context: any) {
     props.onSelectedOptionChange(event, value);
   };
 
+  const buildOptionLabel = (option: any): string => {
+    if (option.longname) {
+      return `${option.symbol} - ${option.longname}`
+    }
+    return option.symbol;
+  }
+
   React.useEffect(() => {
     if (!open) {
       setOptions([]);
@@ -59,7 +66,7 @@ export default function SearchAutocomplete(props: any, context: any) {
         setOpen(false);
       }}
       getOptionSelected={(option, value) => option.symbol === value.symbol}
-      getOptionLabel={(option) => option.symbol}
+      getOptionLabel={buildOptionLabel}
       filterOptions={(options) => options}
       options={options}
       loading={loading}
