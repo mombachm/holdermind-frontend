@@ -23,7 +23,6 @@ export class UserStockDataService {
   }
 
   public static async removeStockCodeFromUser(stockCode: string): Promise<any> {
-    stockCode = stockCode.replace(".SA", "");
     const response = await Axios.post(
       process.env.REACT_APP_HOLDERMIN_BACKEND_URI + StockControllerRoute.RemoveUserStockCode, { code: stockCode }
     );

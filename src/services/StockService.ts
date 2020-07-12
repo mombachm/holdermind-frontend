@@ -3,6 +3,7 @@ import Axios from "axios";
 export enum StockControllerRoute {
   GetStocksInfo = "/getStocksInfo",
   GetStockMainInfo = "/getStockMainInfo",
+  SearchStocks = "/searchStocks",
 }
 
 export class StockService {
@@ -31,6 +32,23 @@ export class StockService {
       return response.data;
     }
     return null;
+  }
+
+  public static async searchStocks(
+    searchText: string
+  ): Promise<any | null> {
+    const response = await Axios.get(
+      process.env.REACT_APP_STOCK_SERVICE_URI + StockControllerRoute.SearchStocks,
+      {
+        params: {
+          searchText: searchText,
+        },
+      }
+    );
+    if(response.data) {
+      return response.data;
+    }
+    return [];
   }
 
   private static buildGetStocksInfoParameters(stocksCode: string | string[]) {

@@ -31,6 +31,9 @@ import { MainFormatter } from "../formatters/MainFormatter";
 import { UserStockDataService } from "../services/UserStockDataService";
 import { MessageAlert } from "../messages/MessageAlert";
 import { Message } from "../messages/Messages";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import { TextField } from "@material-ui/core";
+import SearchAutocomplete from "./SearchAutocomplete";
 
 const tableIcons: Icons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -65,58 +68,81 @@ interface StockCode {
   code: string
 }
 
+const top100Films = [
+  { title: 'The Shawshank Redemption', year: 1994 },
+  { title: 'The Godfather', year: 1972 },
+  { title: 'The Godfather: Part II', year: 1974 },
+  { title: 'The Dark Knight', year: 2008 },
+];
+
+interface StockOption {
+  symbol: string;
+}
+
 const StocksTable: React.FC = () => {
   const [stocksCode, setStocksCode] = useState<StockCode[]>([]);
+  const [selectedValue, setSelectedValue] = React.useState<StockOption | null>(null);
   const [tableState, setTableState] = useState<TableState>({
     columns: [
-      { title: "Código", field: "symbol", type: "string" },
+      { title: "Código", field: "symbol", type: "string",
+      editComponent: props => (
+        <SearchAutocomplete onSelectedOptionChange={(e: any, value: StockOption | null) => setSelectedValue(value)}/>
+      ) },
       {
         title: "Variação (%)",
         field: "regularMarketChangePercent",
         type: "numeric",
-        render: rowData => MainFormatter.formatDecimalValue(rowData.regularMarketChangePercent)
+        editable: "never",
+        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.regularMarketChangePercent : "")
       },
       {
         title: "Valor de Mercado (R$)",
         field: "regularMarketPrice",
         type: "numeric",
-        render: rowData => MainFormatter.formatDecimalValue(rowData.regularMarketPrice)
+        editable: "never",
+        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.regularMarketPrice : "")
       },
       {
         title: "Dividend Yield (%)",
         field: "dividendYield",
         type: "numeric",
-        render: rowData => MainFormatter.formatDecimalValue(rowData.dividendYield)
+        editable: "never",
+        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.dividendYield : "")
       },
       {
         title: "Dividend Yield Passado Anual (%)",
         field: "trailingAnnualDividendYield",
         type: "numeric",
-        render: rowData => MainFormatter.formatPercentValue(rowData.trailingAnnualDividendYield)
+        editable: "never",
+        render: rowData => MainFormatter.formatPercentValue(rowData ? rowData.trailingAnnualDividendYield : "")
       },
       {
         title: "P/L Passado",
         field: "trailingPE",
         type: "numeric",
-        render: rowData => MainFormatter.formatDecimalValue(rowData.trailingPE)
+        editable: "never",
+        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.trailingPE : "")
       },
       {
         title: "P/L Futuro",
         field: "forwardPE",
         type: "numeric",
-        render: rowData => MainFormatter.formatDecimalValue(rowData.forwardPE)
+        editable: "never",
+        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.forwardPE : "")
       },
       {
         title: "ROA (%)",
         field: "returnOnAssets",
         type: "numeric",
-        render: rowData => MainFormatter.formatPercentValue(rowData.returnOnAssets)
+        editable: "never",
+        render: rowData => MainFormatter.formatPercentValue(rowData ? rowData.returnOnAssets : "")
       },
       {
         title: "ROE (%)",
         field: "returnOnEquity",
         type: "numeric",
-        render: rowData => MainFormatter.formatPercentValue(rowData.returnOnEquity)
+        editable: "never",
+        render: rowData => MainFormatter.formatPercentValue(rowData ? rowData.returnOnEquity : "")
       }
     ],
     data: [],
@@ -149,10 +175,10 @@ const StocksTable: React.FC = () => {
   }
 
   const saveStockInfoItem = async (stockInfoItem: any): Promise<void> => {
-    if (stockInfoItem.symbol && !isStockCodeAlreadyInTable(stockInfoItem.symbol)) {
-      const stockInfo = await fetchStockInfo(stockInfoItem.symbol);
+    if (selectedValue && !isStockCodeAlreadyInTable(selectedValue.symbol)) {
+      const stockInfo = await fetchStockInfo(selectedValue.symbol);
       if (stockInfo) {
-        await UserStockDataService.addUserStockCode(stockInfoItem.symbol);
+        await UserStockDataService.addUserStockCode(selectedValue.symbol);
       } else {
         MessageAlert.showInfoMessage(Message.invalidStock);
       }
