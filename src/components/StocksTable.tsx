@@ -29,6 +29,8 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import { MainFormatter } from "../formatters/MainFormatter";
 import { UserStockDataService } from "../services/UserStockDataService";
+import { MessageAlert } from "../messages/MessageAlert";
+import { Message } from "../messages/Messages";
 
 const tableIcons: Icons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -127,13 +129,14 @@ const StocksTable: React.FC = () => {
   }
 
   async function fetchStocks(): Promise<any> {
-    debugger;
     const stocksCode = await fetchUserStocksCode();
     const stocksDataPromises: Promise<StockCode>[] = stocksCode.map(async stockCode => {
       return await StockService.getStockMainInfo(stockCode.code);
     });
     return Promise.all(stocksDataPromises).then((stocksData) => {
-      return stocksData;
+      return stocksData.filter(stockInfo => {
+        return stockInfo;
+      });
     });
   }
 
@@ -150,6 +153,8 @@ const StocksTable: React.FC = () => {
       const stockInfo = await fetchStockInfo(stockInfoItem.symbol);
       if (stockInfo) {
         await UserStockDataService.addUserStockCode(stockInfoItem.symbol);
+      } else {
+        MessageAlert.showInfoMessage(Message.invalidStock);
       }
     }
   };
@@ -162,7 +167,7 @@ const StocksTable: React.FC = () => {
 
   const isStockCodeAlreadyInTable = (stockCode: string): boolean => {
     return Boolean(
-      getStockInfoInTable(stockCode)
+      getStockInfoInTable(stockCode.toUpperCase())
     );
   };
 
@@ -184,7 +189,6 @@ const StocksTable: React.FC = () => {
         data={() =>
           new Promise(async (resolve, reject) => {
               const data = await fetchStocks();
-              debugger;
               resolve({
                   data,
                   page: 0,

@@ -8,7 +8,7 @@ export enum StockControllerRoute {
 export class StockService {
   public static async getStocksInfo(
     stocksCode: string | string[]
-  ): Promise<any[]> {
+  ): Promise<any[] | null> {
     const response = await Axios.get(
       process.env.REACT_APP_STOCK_SERVICE_URI + StockControllerRoute.GetStocksInfo,
       this.buildGetStocksInfoParameters(stocksCode)
