@@ -1,16 +1,6 @@
-// import '@material/list/dist/mdc.list.css';
-// import './DonationList.css';
 import React, { useState, useEffect, forwardRef } from "react";
 import { StockService } from "../services/StockService";
 import MaterialTable, { Column, Icons } from "material-table";
-// import { List, ListItem, ListItemGraphic, ListItemText, ListItemPrimaryText, ListItemSecondaryText, ListItemMeta } from '@rmwc/list';
-// import { Donation } from '../../models/Donation';
-// import { DonationService } from '../../services/DonationService';
-// import { DonationIntention } from '../../models/DonationIntention';
-// import { DonationIntentionService } from '../../services/DonationIntentionService';
-// import { DonationItemService } from '../../services/DonationItemService';
-// import { Link } from 'react-router-dom';
-// import FolderIcon from '@material-ui/icons/Folder';
 import AddIcon from "@material-ui/icons/Add";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
@@ -29,10 +19,6 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import { MainFormatter } from "../formatters/MainFormatter";
 import { UserStockDataService } from "../services/UserStockDataService";
-import { MessageAlert } from "../messages/MessageAlert";
-import { Message } from "../messages/Messages";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import { TextField } from "@material-ui/core";
 import SearchAutocomplete from "./SearchAutocomplete";
 
 const tableIcons: Icons = {
@@ -65,102 +51,144 @@ interface TableState {
 }
 
 interface StockCode {
-  code: string
+  code: string;
 }
-
-const top100Films = [
-  { title: 'The Shawshank Redemption', year: 1994 },
-  { title: 'The Godfather', year: 1972 },
-  { title: 'The Godfather: Part II', year: 1974 },
-  { title: 'The Dark Knight', year: 2008 },
-];
 
 interface StockOption {
   symbol: string;
 }
 
+const buildStockChangePercentCellStyle = (rowData: any) => {
+  if (!rowData || !rowData.regularMarketChangePercent) {
+    return {};
+  }
+  const value = rowData.regularMarketChangePercent;
+  if (value > 0) {
+    return { color: "green" };
+  }
+  if (value < 0) {
+    return { color: "red" };
+  }
+  return {};
+};
+
 const StocksTable: React.FC = () => {
   const [stocksCode, setStocksCode] = useState<StockCode[]>([]);
-  const [selectedValue, setSelectedValue] = React.useState<StockOption | null>(null);
+  const [selectedValue, setSelectedValue] = React.useState<StockOption | null>(
+    null
+  );
   const [tableState, setTableState] = useState<TableState>({
     columns: [
-      { title: "Código", field: "symbol", type: "string",
-      editComponent: props => (
-        <SearchAutocomplete onSelectedOptionChange={(e: any, value: StockOption | null) => setSelectedValue(value)}/>
-      ) },
+      {
+        title: "Código",
+        field: "symbol",
+        type: "string",
+        editComponent: (props) => (
+          <SearchAutocomplete
+            onSelectedOptionChange={(e: any, value: StockOption | null) =>
+              setSelectedValue(value)
+            }
+          />
+        ),
+      },
       {
         title: "Variação (%)",
         field: "regularMarketChangePercent",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.regularMarketChangePercent : "")
+        render: (rowData) => (
+          <a style={buildStockChangePercentCellStyle(rowData)}>
+            {MainFormatter.formatDecimalValue(
+              rowData ? rowData.regularMarketChangePercent : ""
+            )}
+          </a>
+        ),
       },
       {
         title: "Valor de Mercado (R$)",
         field: "regularMarketPrice",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.regularMarketPrice : "")
+        render: (rowData) =>
+          MainFormatter.formatDecimalValue(
+            rowData ? rowData.regularMarketPrice : ""
+          ),
       },
       {
         title: "Dividend Yield (%)",
         field: "dividendYield",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.dividendYield : "")
+        render: (rowData) =>
+          MainFormatter.formatDecimalValue(
+            rowData ? rowData.dividendYield : ""
+          ),
       },
       {
         title: "Dividend Yield Passado Anual (%)",
         field: "trailingAnnualDividendYield",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatPercentValue(rowData ? rowData.trailingAnnualDividendYield : "")
+        render: (rowData) =>
+          MainFormatter.formatPercentValue(
+            rowData ? rowData.trailingAnnualDividendYield : ""
+          ),
       },
       {
         title: "P/L Passado",
         field: "trailingPE",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.trailingPE : "")
+        render: (rowData) =>
+          MainFormatter.formatDecimalValue(rowData ? rowData.trailingPE : ""),
       },
       {
         title: "P/L Futuro",
         field: "forwardPE",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatDecimalValue(rowData ? rowData.forwardPE : "")
+        render: (rowData) =>
+          MainFormatter.formatDecimalValue(rowData ? rowData.forwardPE : ""),
       },
       {
         title: "ROA (%)",
         field: "returnOnAssets",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatPercentValue(rowData ? rowData.returnOnAssets : "")
+        render: (rowData) =>
+          MainFormatter.formatPercentValue(
+            rowData ? rowData.returnOnAssets : ""
+          ),
       },
       {
         title: "ROE (%)",
         field: "returnOnEquity",
         type: "numeric",
         editable: "never",
-        render: rowData => MainFormatter.formatPercentValue(rowData ? rowData.returnOnEquity : "")
-      }
+        render: (rowData) =>
+          MainFormatter.formatPercentValue(
+            rowData ? rowData.returnOnEquity : ""
+          ),
+      },
     ],
     data: [],
   });
 
   async function fetchUserStocksCode(): Promise<StockCode[]> {
-    const stocksCode = await UserStockDataService.GetUserStockCodes() as StockCode[];
+    const stocksCode = (await UserStockDataService.GetUserStockCodes()) as StockCode[];
     setStocksCode(stocksCode);
     return stocksCode;
   }
 
   async function fetchStocks(): Promise<any> {
     const stocksCode = await fetchUserStocksCode();
-    const stocksDataPromises: Promise<StockCode>[] = stocksCode.map(async stockCode => {
-      return await StockService.getStockMainInfo(stockCode.code);
-    });
+    const stocksDataPromises: Promise<StockCode>[] = stocksCode.map(
+      async (stockCode) => {
+        return await StockService.getStockMainInfo(stockCode.code);
+      }
+    );
     return Promise.all(stocksDataPromises).then((stocksData) => {
-      return stocksData.filter(stockInfo => {
+      return stocksData.filter((stockInfo) => {
         return stockInfo;
       });
     });
@@ -182,20 +210,20 @@ const StocksTable: React.FC = () => {
 
   const deleteStockInfoItem = async (oldStockInfoItem: any): Promise<void> => {
     if (oldStockInfoItem.symbol) {
-      await UserStockDataService.removeStockCodeFromUser(oldStockInfoItem.symbol);
+      await UserStockDataService.removeStockCodeFromUser(
+        oldStockInfoItem.symbol
+      );
     }
   };
 
   const isStockCodeAlreadyInTable = (stockCode: string): boolean => {
-    return Boolean(
-      getStockInfoInTable(stockCode.toUpperCase())
-    );
+    return Boolean(getStockInfoInTable(stockCode.toUpperCase()));
   };
 
   const getStockInfoInTable = (stockCode: string): any => {
     return stocksCode.find((code) => {
       return stockCode.includes(code.code);
-    })
+    });
   };
 
   return (
@@ -203,26 +231,25 @@ const StocksTable: React.FC = () => {
       <MaterialTable
         options={{
           paging: false,
-          actionsColumnIndex: -1
+          actionsColumnIndex: -1,
+          search: false
         }}
         icons={tableIcons}
         title="Ações"
         columns={tableState.columns}
-        data={() =>
-          new Promise(async (resolve, reject) => {
-              const data = await fetchStocks();
-              resolve({
-                  data,
-                  page: 0,
-                  totalCount: data.length
-              });
-          })
-        }
+        data={async () => {
+          const data = await fetchStocks();
+          return {
+            data,
+            page: 0,
+            totalCount: data.length,
+          };
+        }}
         editable={{
           onRowAdd: (newData) => {
             return saveStockInfoItem(newData);
           },
-          onRowDelete: oldData => {
+          onRowDelete: (oldData) => {
             return deleteStockInfoItem(oldData);
           },
         }}
