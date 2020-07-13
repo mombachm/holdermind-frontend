@@ -3,25 +3,38 @@ import './App.css';
 import StocksTable from './components/StocksTable';
 import { createMuiTheme, MuiThemeProvider, Box, makeStyles, AppBar, Toolbar, IconButton, Typography, Button, Menu } from '@material-ui/core';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import { green, orange, grey } from '@material-ui/core/colors';
 
 const customTheme = createMuiTheme({
   palette: {
     primary: {
-      main: '#01A0DB'
+      contrastText: "rgba(0, 0, 0, 0.87)",
+      dark: "rgb(100, 141, 174)",
+      light: "rgb(166, 212, 250)",
+      main: orange[500]
     },
     secondary: {
-      main: '#eee'
+      contrastText: "rgba(0, 0, 0, 0.87)",
+      dark: "rgb(170, 100, 123)",
+      light: "rgb(246, 165, 192)",
+      main: "#0A0A0A"
     },
     text:{
-      primary: '#333',
-      secondary: '#777'
+      disabled: "rgba(255, 255, 255, 0.5)",
+      hint: "rgba(255, 255, 255, 0.5)",
+      primary: "#fff",
+      secondary: "rgba(255, 255, 255, 0.7)"
+    },
+    background: {
+      default: "#121212",
+      paper: "#424242"
     }
-  }
+  },
 });
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: 'black',
+    backgroundColor: '#222',
     backgroundSize: '100%',
   },
   title: {
@@ -34,8 +47,8 @@ function App() {
   const classes = useStyles();
 
   return (
-    <div>
-      <MuiThemeProvider theme={customTheme}>
+    <MuiThemeProvider theme={customTheme}>
+      <div className={classes.root}>
         <Box height="100%" className={classes.root}>
           <AppBar color="secondary" position="static">
             <Toolbar>
@@ -48,13 +61,13 @@ function App() {
               <Button color="default" endIcon={<VpnKeyIcon/>}>Login</Button>
             </Toolbar>
           </AppBar>
-          <Box className={classes.content}>
+          <Box color="primary" height="100%" className={classes.content}>
             {/* <Route exact path="/" title="Teste" component={Home}/> */}
             <StocksTable/>
           </Box>
         </Box>
-      </MuiThemeProvider>
-    </div>
+      </div>
+    </MuiThemeProvider>
   );
 }
 

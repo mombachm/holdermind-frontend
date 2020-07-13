@@ -72,6 +72,9 @@ const buildStockChangePercentCellStyle = (rowData: any) => {
   return {};
 };
 
+const cellStyle = {
+}
+
 const StocksTable: React.FC = () => {
   const [stocksCode, setStocksCode] = useState<StockCode[]>([]);
   const [selectedValue, setSelectedValue] = React.useState<StockOption | null>(
@@ -83,6 +86,7 @@ const StocksTable: React.FC = () => {
         title: "Código",
         field: "symbol",
         type: "string",
+        cellStyle,
         editComponent: (props) => (
           <SearchAutocomplete
             onSelectedOptionChange={(e: any, value: StockOption | null) =>
@@ -96,6 +100,7 @@ const StocksTable: React.FC = () => {
         field: "regularMarketChangePercent",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) => (
           <a style={buildStockChangePercentCellStyle(rowData)}>
             {MainFormatter.formatDecimalValue(
@@ -109,6 +114,7 @@ const StocksTable: React.FC = () => {
         field: "regularMarketPrice",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) =>
           MainFormatter.formatDecimalValue(
             rowData ? rowData.regularMarketPrice : ""
@@ -119,6 +125,7 @@ const StocksTable: React.FC = () => {
         field: "dividendYield",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) =>
           MainFormatter.formatDecimalValue(
             rowData ? rowData.dividendYield : ""
@@ -129,6 +136,7 @@ const StocksTable: React.FC = () => {
         field: "trailingAnnualDividendYield",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) =>
           MainFormatter.formatPercentValue(
             rowData ? rowData.trailingAnnualDividendYield : ""
@@ -139,6 +147,7 @@ const StocksTable: React.FC = () => {
         field: "trailingPE",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) =>
           MainFormatter.formatDecimalValue(rowData ? rowData.trailingPE : ""),
       },
@@ -147,6 +156,7 @@ const StocksTable: React.FC = () => {
         field: "forwardPE",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) =>
           MainFormatter.formatDecimalValue(rowData ? rowData.forwardPE : ""),
       },
@@ -155,6 +165,7 @@ const StocksTable: React.FC = () => {
         field: "returnOnAssets",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) =>
           MainFormatter.formatPercentValue(
             rowData ? rowData.returnOnAssets : ""
@@ -165,6 +176,7 @@ const StocksTable: React.FC = () => {
         field: "returnOnEquity",
         type: "numeric",
         editable: "never",
+        cellStyle,
         render: (rowData) =>
           MainFormatter.formatPercentValue(
             rowData ? rowData.returnOnEquity : ""
@@ -229,10 +241,17 @@ const StocksTable: React.FC = () => {
   return (
     <div className="MaterialTable-div">
       <MaterialTable
+        style={{
+          backgroundColor: '#2A2A2A',
+          color: '#FFF'
+        }}
         options={{
           paging: false,
           actionsColumnIndex: -1,
-          search: false
+          search: false,
+          actionsCellStyle: {
+            color: '#AAA',
+          }
         }}
         icons={tableIcons}
         title="Ações"

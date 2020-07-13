@@ -57,7 +57,7 @@ export default function SearchAutocomplete(props: any, context: any) {
   return (
     <Autocomplete
       id="asynchronous-autocomplete"
-      style={{ width: 300 }}
+      style={{ width: 300}}
       open={open}
       onOpen={() => {
         setOpen(true);
