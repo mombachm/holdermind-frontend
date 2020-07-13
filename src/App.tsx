@@ -7,6 +7,19 @@ import { green, orange, grey } from '@material-ui/core/colors';
 
 const customTheme = createMuiTheme({
   palette: {
+    action: {
+      activatedOpacity: 0.24,
+      active: "#fff",
+      disabled: "rgba(255, 255, 255, 0.3)",
+      disabledBackground: "rgba(255, 255, 255, 0.12)",
+      disabledOpacity: 0.38,
+      focus: "rgba(255, 255, 255, 0.12)",
+      focusOpacity: 0.12,
+      hover: "rgba(255, 255, 255, 0.08)",
+      hoverOpacity: 0.08,
+      selected: "rgba(255, 255, 255, 0.16)",
+      selectedOpacity: 0.16,
+    },
     primary: {
       contrastText: "rgba(0, 0, 0, 0.87)",
       dark: "rgb(100, 141, 174)",
@@ -28,8 +41,22 @@ const customTheme = createMuiTheme({
     background: {
       default: "#121212",
       paper: "#424242"
-    }
+    },
   },
+  overrides: {
+    MuiInput: {
+      underline: {
+        "&&&&:before": {
+          borderBottom: "1px solid rgba(255, 255, 255, 0.7)"
+        }
+      }
+    },
+    MuiOutlinedInput: {
+      notchedOutline: {
+        borderColor: '#777'
+      },
+    },
+  }
 });
 
 const useStyles = makeStyles(theme => ({
