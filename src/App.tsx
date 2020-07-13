@@ -56,6 +56,11 @@ const customTheme = createMuiTheme({
         borderColor: '#777'
       },
     },
+    MuiTableCell: {
+      root: {
+        borderBottomColor: "#333"
+      }
+    }
   }
 });
 
