@@ -80,6 +80,8 @@ const StocksTable: React.FC = () => {
   const [selectedValue, setSelectedValue] = React.useState<StockOption | null>(
     null
   );
+  const [tableShouldBeLoaded, setTableShouldBeLoaded] = useState(true);
+  const [isTableLoading, setIsTableLoading] = useState(false);
   const [tableState, setTableState] = useState<TableState>({
     columns: [
       {
@@ -217,6 +219,7 @@ const StocksTable: React.FC = () => {
   const saveStockInfoItem = async (stockInfoItem: any): Promise<void> => {
     if (selectedValue && !isStockCodeAlreadyInTable(selectedValue.symbol)) {
       await UserStockDataService.addUserStockCode(selectedValue.symbol);
+      setTableShouldBeLoaded(true);
     }
   };
 
@@ -225,6 +228,7 @@ const StocksTable: React.FC = () => {
       await UserStockDataService.removeStockCodeFromUser(
         oldStockInfoItem.symbol
       );
+      setTableShouldBeLoaded(true);
     }
   };
 
@@ -238,6 +242,21 @@ const StocksTable: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    const test = async () => {
+      setIsTableLoading(true);
+      const data = await fetchStocks();
+      setTableState((prevState) => {
+        return { ...prevState, data };
+      });
+      setIsTableLoading(false);
+      setTableShouldBeLoaded(false);
+    }
+    if (tableShouldBeLoaded) {
+      test();
+    }
+  }, [tableShouldBeLoaded])
+
   return (
     <div className="MaterialTable-div">
       <MaterialTable
@@ -247,23 +266,15 @@ const StocksTable: React.FC = () => {
         }}
         options={{
           paging: false,
-          actionsColumnIndex: -1,
-          search: false,
           actionsCellStyle: {
             color: '#AAA',
           }
         }}
+        isLoading={isTableLoading}
         icons={tableIcons}
         title="Ações"
         columns={tableState.columns}
-        data={async () => {
-          const data = await fetchStocks();
-          return {
-            data,
-            page: 0,
-            totalCount: data.length,
-          };
-        }}
+        data={tableState.data}
         editable={{
           onRowAdd: (newData) => {
             return saveStockInfoItem(newData);
